@@ -7,6 +7,7 @@ Provides command-line interface for backup and restore operations in the refacto
 from llm_refactor.modules.base import SimpleModule
 from llm_refactor.core.config import config
 from .manager import BackupManager
+from llm_refactor.core.paths import REPO_ROOT, REPOSITORIES
 from .exceptions import (
     BackupExistsError,
     BackupNotFoundError,
@@ -33,7 +34,7 @@ class BackupManagerModule(SimpleModule):
     def _get_backup_manager(self) -> BackupManager:
         """Get BackupManager instance with correct repositories path."""
         # Repositories are in parent directory of llm-refactor-pipeline
-        repositories_dir = config.PROJECT_ROOT.parent / "repositories"
+        repositories_dir = REPOSITORIES
         return BackupManager(repositories_dir=repositories_dir)
     
     def execute(self, args: str = "") -> str:

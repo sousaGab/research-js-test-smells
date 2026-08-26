@@ -15,6 +15,7 @@ from pathlib import Path
 from typing import Optional, Tuple
 
 from llm_refactor.core.config import config
+from llm_refactor.core.paths import REPO_ROOT, REPOSITORIES
 from .exceptions import (
     BackupExistsError,
     BackupNotFoundError,
@@ -77,8 +78,8 @@ class BackupManager:
         Raises:
             InvalidPathError: If repositories_dir does not exist.
         """
-        self.repositories_dir = repositories_dir or (config.PROJECT_ROOT / "repositories")
-        self.backup_dir = backup_dir or (config.PROJECT_ROOT / "backup")
+        self.repositories_dir = repositories_dir or (REPOSITORIES)
+        self.backup_dir = backup_dir or (config.PIPELINE_ROOT / "backup")
         self.allow_backup_overwrite = allow_backup_overwrite
         
         # Validate repositories directory exists

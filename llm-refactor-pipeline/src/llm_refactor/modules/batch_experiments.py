@@ -13,6 +13,7 @@ from llm_refactor.modules.base import SimpleModule
 from llm_refactor.modules.database.connection import ResearchDB
 from llm_refactor.modules.execute_experiment import ExecuteExperimentModule
 from llm_refactor.modules.refactor.hf_client import PromptStrategy, HuggingFaceModels
+from llm_refactor.core.paths import BATCH_SUMMARIES
 
 
 class BatchExperimentsModule(SimpleModule):
@@ -807,7 +808,7 @@ NOTES:
         from pathlib import Path
         
         # Create summary directory
-        summary_dir = Path("batch_summaries")
+        summary_dir = BATCH_SUMMARIES
         summary_dir.mkdir(exist_ok=True)
         
         # Generate filename with timestamp
@@ -860,7 +861,7 @@ NOTES:
         from pathlib import Path
         
         # Create summary directory
-        summary_dir = Path("batch_summaries")
+        summary_dir = BATCH_SUMMARIES
         summary_dir.mkdir(exist_ok=True)
         
         # Generate filename with timestamp
@@ -1059,7 +1060,7 @@ NOTES:
         from pathlib import Path
         import json
         
-        manifest_dir = Path("batch_summaries")
+        manifest_dir = BATCH_SUMMARIES
         manifest_dir.mkdir(exist_ok=True)
         
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")

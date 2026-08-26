@@ -12,6 +12,7 @@ from llm_refactor.modules.base import SimpleModule
 from llm_refactor.modules.database.connection import ResearchDB
 from llm_refactor.modules.database.crud import get_study_smell
 from .smell_catalog import TEST_SMELL_CATALOG
+from llm_refactor.core.paths import REPO_ROOT, REPOSITORIES
 from .hf_client import (
     HuggingFaceRefactorClient,
     HuggingFaceModels,
@@ -350,7 +351,7 @@ NOTE:
         try:
             # Get repositories directory (parent of llm-refactor-pipeline)
             from llm_refactor.core.config import config
-            repositories_dir = config.PROJECT_ROOT.parent / "repositories"
+            repositories_dir = REPOSITORIES
             
             # Initialize BackupManager with correct path
             backup_manager = BackupManager(repositories_dir=repositories_dir)

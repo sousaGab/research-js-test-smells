@@ -6,6 +6,7 @@ test execution → restore → save results.
 """
 
 import time
+from llm_refactor.core.paths import REPO_ROOT, REPOSITORIES
 from pathlib import Path
 from typing import Dict, Any, Optional
 
@@ -87,10 +88,10 @@ class ExecuteExperimentModule(SimpleModule):
     def __init__(self):
         super().__init__()
         # Repositories are at project root (parent of llm-refactor-pipeline)
-        project_root = Config.PROJECT_ROOT.parent
+        project_root = REPO_ROOT
         self.backup_manager = BackupManager(
             repositories_dir=project_root / "repositories",
-            backup_dir=Config.PROJECT_ROOT / "backup",
+            backup_dir=Config.PIPELINE_ROOT / "backup",
             # Preserve original backups during re-execution (--redo)
             # This ensures backup files are never overwritten, only reused
             allow_backup_overwrite=False
@@ -348,7 +349,7 @@ NOTES:
             # Save refactored code to dataset
             refactored_file = output_dir / "refactored_code.js"
             refactored_file.write_text(refactored_code, encoding='utf-8')
-            print(f"   ✓ Saved to: {refactored_file.relative_to(Config.PROJECT_ROOT)}")
+            print(f"   ✓ Saved to: {refactored_file.relative_to(Config.PIPELINE_ROOT)}")
             
             # Step 4: Apply changes (with backup)
             print("💾 [4/7] Applying refactored code to repository (with backup)...")
@@ -393,7 +394,7 @@ NOTES:
             )
             
             if smell_detection_success:
-                print(f"   ✓ Smell detection results saved to: {smell_output_dir.relative_to(Config.PROJECT_ROOT)}")
+                print(f"   ✓ Smell detection results saved to: {smell_output_dir.relative_to(Config.PIPELINE_ROOT)}")
             else:
                 print("   ⚠ Smell detection encountered issues (check logs)")
             
@@ -403,8 +404,8 @@ NOTES:
             
             if test_results['success']:
                 print("   ✓ Tests executed successfully")
-                print(f"   → Summary: {output_dir.relative_to(Config.PROJECT_ROOT)}/test_summary.txt")
-                print(f"   → Full output: {output_dir.relative_to(Config.PROJECT_ROOT)}/test_output.txt")
+                print(f"   → Summary: {output_dir.relative_to(Config.PIPELINE_ROOT)}/test_summary.txt")
+                print(f"   → Full output: {output_dir.relative_to(Config.PIPELINE_ROOT)}/test_output.txt")
                 print(f"   → Exit code: {test_results.get('exit_code', 'N/A')}")
             else:
                 print(f"   ⚠ Tests failed or timed out: {test_results.get('error', 'Unknown')}")
@@ -565,7 +566,7 @@ NOTES:
             # Save refactored code to dataset
             refactored_file = output_dir / "refactored_code.js"
             refactored_file.write_text(refactored_code, encoding='utf-8')
-            print(f"   ✓ Saved to: {refactored_file.relative_to(Config.PROJECT_ROOT)}")
+            print(f"   ✓ Saved to: {refactored_file.relative_to(Config.PIPELINE_ROOT)}")
             
             # Step 4: Create experiment record
             print("💾 Creating experiment record in database...")
@@ -606,8 +607,8 @@ NOTES:
                 f"Model:            {model_name}",
                 f"Execution Time:   {execution_time:.2f}s",
                 "",
-                f"Output Directory: {output_dir.relative_to(Config.PROJECT_ROOT)}",
-                f"Refactored Code:  {refactored_file.relative_to(Config.PROJECT_ROOT)}",
+                f"Output Directory: {output_dir.relative_to(Config.PIPELINE_ROOT)}",
+                f"Refactored Code:  {refactored_file.relative_to(Config.PIPELINE_ROOT)}",
                 "",
                 "⚠️  NOTE: Changes NOT applied to repository (refactor phase only)",
                 "",
@@ -741,10 +742,10 @@ NOTES:
             strategy_name_lower = experiment.prompting_approach.lower().replace("-", "_").replace(" ", "_")
             model_name_lower = experiment.ai_model_version.lower().replace(" ", "-").replace("(", "").replace(")", "")
             
-            output_dir = Config.PROJECT_ROOT / "dataset" / strategy_name_lower / model_name_lower / f"smell_{experiment.study_smell_id}"
+            output_dir = Config.PIPELINE_ROOT / "dataset" / strategy_name_lower / model_name_lower / f"smell_{experiment.study_smell_id}"
             output_dir.mkdir(parents=True, exist_ok=True)
             
-            print(f"   ✓ Output directory: {output_dir.relative_to(Config.PROJECT_ROOT)}")
+            print(f"   ✓ Output directory: {output_dir.relative_to(Config.PIPELINE_ROOT)}")
             print(f"   ✓ Refactored code loaded ({len(refactored_code)} chars)")
             
             # Step 1: Apply changes (with backup)
@@ -778,7 +779,7 @@ NOTES:
             )
             
             if smell_detection_success:
-                print(f"   ✓ Smell detection results saved to: {smell_output_dir.relative_to(Config.PROJECT_ROOT)}")
+                print(f"   ✓ Smell detection results saved to: {smell_output_dir.relative_to(Config.PIPELINE_ROOT)}")
             else:
                 print("   ⚠ Smell detection encountered issues (check logs)")
             
@@ -788,8 +789,8 @@ NOTES:
             
             if test_results['success']:
                 print("   ✓ Tests executed successfully")
-                print(f"   → Summary: {output_dir.relative_to(Config.PROJECT_ROOT)}/test_summary.txt")
-                print(f"   → Full output: {output_dir.relative_to(Config.PROJECT_ROOT)}/test_output.txt")
+                print(f"   → Summary: {output_dir.relative_to(Config.PIPELINE_ROOT)}/test_summary.txt")
+                print(f"   → Full output: {output_dir.relative_to(Config.PIPELINE_ROOT)}/test_output.txt")
                 print(f"   → Exit code: {test_results.get('exit_code', 'N/A')}")
             else:
                 print(f"   ⚠ Tests failed or timed out: {test_results.get('error', 'Unknown')}")
@@ -863,7 +864,7 @@ NOTES:
                 f"Tests Passed:     {test_results.get('success') and test_results.get('exit_code') == 0}",
                 f"Smell Removed:    {analysis_results.get('target_smell_removed') if analysis_results else 'N/A'}",
                 "",
-                f"Output Directory: {output_dir.relative_to(Config.PROJECT_ROOT)}",
+                f"Output Directory: {output_dir.relative_to(Config.PIPELINE_ROOT)}",
                 "",
                 "=" * 80
             ]
@@ -1002,7 +1003,7 @@ NOTES:
         strategy_name = self._get_strategy_name(strategy_id)
         model_name = self._get_model_name(model_id)
         
-        output_dir = Config.PROJECT_ROOT / "dataset" / strategy_name / model_name / f"smell_{smell_id}"
+        output_dir = Config.PIPELINE_ROOT / "dataset" / strategy_name / model_name / f"smell_{smell_id}"
         output_dir.mkdir(parents=True, exist_ok=True)
         
         return output_dir
@@ -1378,7 +1379,7 @@ NOTES:
         """
         try:
             # Get baseline CSV path (already exists from previous detection)
-            project_root = Config.PROJECT_ROOT.parent
+            project_root = REPO_ROOT
             baseline_csv = project_root / "smells_detected" / repo_name / "smells.csv"
             
             # Get refactored CSV path
@@ -1443,7 +1444,7 @@ NOTES:
             )
             
             if save_success:
-                print(f"   ✓ Analysis saved: {analysis_dir.relative_to(Config.PROJECT_ROOT)}/smell_analysis.json")
+                print(f"   ✓ Analysis saved: {analysis_dir.relative_to(Config.PIPELINE_ROOT)}/smell_analysis.json")
             
             # Update experiment flags (no smell details saved to DB, only analysis flags)
             target_removed = analysis['summary']['target_smell_removed']
@@ -1496,7 +1497,7 @@ NOTES:
         """
         try:
             # Get baseline test summary path (from tests_output/)
-            project_root = Config.PROJECT_ROOT.parent
+            project_root = REPO_ROOT
             baseline_summary = project_root / "tests_output" / repo_name / "test_summary.txt"
             
             # Get refactored test summary path (from experiment output)
@@ -1586,7 +1587,7 @@ NOTES:
             with open(analysis_json_path, 'w', encoding='utf-8') as f:
                 json.dump(analysis, f, indent=2, default=str)
             
-            print(f"   ✓ Test analysis saved: {analysis_dir.relative_to(Config.PROJECT_ROOT)}/test_analysis.json")
+            print(f"   ✓ Test analysis saved: {analysis_dir.relative_to(Config.PIPELINE_ROOT)}/test_analysis.json")
             
             # Update experiment flags in database
             update_data = {}
@@ -1793,7 +1794,7 @@ NOTES:
         lines.extend([
             "",
             "OUTPUT LOCATION:",
-            f"  {output_dir.relative_to(Config.PROJECT_ROOT)}/",
+            f"  {output_dir.relative_to(Config.PIPELINE_ROOT)}/",
             "    ├── refactored_code.js",
             "    ├── test_summary.txt",
             "    ├── test_output.txt",

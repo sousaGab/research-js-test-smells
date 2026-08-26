@@ -18,8 +18,9 @@ class Config:
     APP_NAME = "LLM Refactor Pipeline"
     VERSION = "0.1.0"
 
-    # Paths
-    PROJECT_ROOT = Path(__file__).parent.parent.parent.parent
+    # Paths — the pipeline's own root (llm-refactor-pipeline/), NOT the repo root.
+    # For repository-level paths use llm_refactor.core.paths.
+    PIPELINE_ROOT = Path(__file__).parent.parent.parent.parent
     HISTORY_FILE = Path.home() / ".llm_refactor_history"
 
     # Future: LLM API settings
