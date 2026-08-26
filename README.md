@@ -1,6 +1,6 @@
 # Research: JavaScript Test Smells Detection and Refactoring
 
-A comprehensive research project for detecting, analyzing, and refactoring test smells in JavaScript codebases using LLM-powered techniques.
+A research project for detecting, analyzing, and refactoring test smells in JavaScript codebases using LLM-powered techniques.
 
 ## Table of Contents
 
