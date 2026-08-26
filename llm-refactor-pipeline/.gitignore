@@ -1,0 +1,66 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Environment variables
+.env
+.env.local
+
+# LLM Refactor specific
+.llm_refactor_history
+experiments/
+results/
+cache/
+
+# Large local datasets
+# Raw dataset folders remain on disk, but are ignored to avoid huge uncompressed pushes.
+dataset/*
+!dataset/README.md
+!dataset/archives/
+dataset/archives/*
+!dataset/archives/.gitkeep
+
+# OS
+.DS_Store
+Thumbs.db

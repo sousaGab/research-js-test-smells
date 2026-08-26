@@ -1,0 +1,23 @@
+# ⚠️ NOTICE: This file is deprecated for project-wide use
+# ⚠️ Please use the root-level requirements.txt instead
+# ⚠️ See: /home/gabriel/Disk/Research/research-javascript-test-smells/requirements.txt
+# ⚠️ Setup guide: VENV_SETUP.md in the project root
+#
+# This file is kept for reference only. The pipeline dependencies are now
+# managed in the unified requirements.txt at the project root.
+
+# Original pipeline-specific dependencies (now in root requirements.txt):
+
+# Core dependencies for LLM Refactor Pipeline
+prompt-toolkit>=3.0.0
+rich>=13.0.0
+
+# Database dependencies
+sqlalchemy>=2.0.0
+pandas>=2.0.0
+
+# Development dependencies (optional)
+# Uncomment for development:
+# pytest>=7.0.0
+# black>=23.0.0
+# ruff>=0.1.0
