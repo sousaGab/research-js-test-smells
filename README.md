@@ -4,6 +4,7 @@ A research project for detecting, analyzing, and refactoring test smells in Java
 
 ## Table of Contents
 
+- [Dissertation](#dissertation)
 - [Overview](#overview)
 - [Features](#features)
 - [Quick Start](#quick-start)
@@ -13,6 +14,20 @@ A research project for detecting, analyzing, and refactoring test smells in Java
 - [Components](#components)
 - [Troubleshooting](#troubleshooting)
 - [Contributing](#contributing)
+
+## Dissertation
+
+This repository accompanies the master's dissertation that reports the study:
+
+> **[Improving JavaScript Test Quality with Large Language Models: Lessons from Test
+> Smell Refactoring](Masters_Dissertation.pdf)**
+>
+> Gabriel Amaral Sousa<br>
+> Programa de Pós-Graduação em Ciência da Computação<br>
+> Universidade Estadual de Feira de Santana — Feira de Santana, 2026
+
+The full text (147 pages) is in the root of this repository as
+[`Masters_Dissertation.pdf`](Masters_Dissertation.pdf).
 
 ## Overview
 
