@@ -8,7 +8,7 @@ compression helper below and keep compressed archives locally under `dataset/arc
 
 ```bash
 cd llm-refactor-pipeline
-python compress_dataset.py
+python scripts/compress_dataset.py
 ```
 
 This keeps the original raw folders such as `zero_shot/`, `few_shot/` and

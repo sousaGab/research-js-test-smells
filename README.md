@@ -200,49 +200,59 @@ cd ../..
 
 ```
 research-javascript-test-smells/
-├── install.sh                      # Unified installation script
 ├── README.md                       # This file
-├── .venv/                          # Python virtual environment
+├── LICENSE                         # MIT (original research code)
+├── THIRD_PARTY_NOTICES.md          # Licenses of vendored third-party code
+├── Masters_Dissertation.pdf        # Full dissertation text
+├── install.sh                      # Unified installation script
+├── setup_venv.sh                   # Virtual environment setup
+├── requirements.txt                # Python dependencies
 │
-├── llm-refactor-pipeline/          # Main refactoring pipeline
-│   ├── llm_refactor/               # Core CLI application
-│   ├── requirements.txt            # Python dependencies
-│   └── README.md                   # Pipeline documentation
+├── docs/                           # Project documentation
+│   ├── quickstart.md               # Getting started guide
+│   ├── venv-setup.md               # Virtual environment guide
+│   ├── running-tests.md            # How to run repository tests
+│   ├── latex-documentation.md      # LaTeX/dissertation notes
+│   ├── database/                   # Database guides (cleanup, export, migration)
+│   └── history/                    # Historical implementation notes
+│
+├── scripts/                        # Research and maintenance scripts
+│   ├── analysis/                   # Experiment analysis tools
+│   ├── db/                         # Database inspection/maintenance
+│   ├── manual_checks/              # Manual diagnostics (RunPod, TGI, parsing)
+│   ├── archive/                    # One-off scripts kept for traceability
+│   ├── check_smells.py             # Smell report checker
+│   └── export_database.py          # Database export tool
+│
+├── llm-refactor-pipeline/          # Main refactoring pipeline (installable package)
+│   ├── pyproject.toml              # Package definition (pip install -e)
+│   ├── src/llm_refactor/           # Core CLI application
+│   ├── docs/                       # Pipeline guides (+ docs/history/)
+│   ├── scripts/                    # Operational tools
+│   │   ├── migrations/             # Applied DB schema migrations
+│   │   ├── backfills/              # Applied data backfills
+│   │   └── archive/                # One-off debug scripts
+│   └── requirements.txt            # Pipeline dependencies
 │
 ├── smell_detection_tools/          # Test smell detectors
 │   ├── steel/                      # Steel detector (TypeScript)
-│   │   ├── src/                    # Source code
-│   │   ├── dist/                   # Compiled output
-│   │   └── package.json            # Dependencies
-│   │
 │   └── snutsjs/                    # SNutsJS detector (JavaScript)
-│       ├── src/                    # Source code
-│       └── package.json            # Dependencies
 │
 ├── smell-selector-ui/              # Web interface
 │   ├── frontend/                   # React + Vite frontend
-│   │   ├── src/                    # React components
-│   │   └── package.json            # Dependencies
-│   │
-│   ├── backend/                    # FastAPI backend
-│   │   ├── main.py                 # API server
-│   │   ├── migrate_database.py    # Database migrations
-│   │   └── requirements.txt        # Python dependencies
-│   │
-│   ├── start.sh                    # Start both frontend + backend
-│   ├── start-frontend.sh           # Start frontend only
-│   └── start-backend.sh            # Start backend only
+│   └── backend/                    # FastAPI backend
 │
-├── research_data/                  # Data storage
-│   └── research.db                 # SQLite database
-│
-├── repositories/                   # Test repositories
-│   ├── redux-offline/              # Example repository
-│   └── ...                         # Other test repos
-│
-└── smells_detected/                # Detection outputs
-    └── ...                         # JSON/CSV reports
+├── research_data/                  # Data storage (research.db)
+├── repositories/                   # Study corpus (third-party projects)
+├── smells_detected/                # Detection outputs per repository
+├── tests_output/                   # Baseline test results per repository
+└── batch_summaries/                # Batch experiment summaries
 ```
+
+Path resolution note: Python scripts locate these data directories through
+`llm_refactor.core.paths`, which anchors on the repository root (the directory
+containing `repositories/`). This requires the pipeline package to be installed
+in editable mode: `pip install -e llm-refactor-pipeline`.
 
 ## Usage
 

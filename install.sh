@@ -204,6 +204,15 @@ print_step "Installing LLM Refactor Pipeline dependencies..."
 if [ -f "$REPO_ROOT/llm-refactor-pipeline/requirements.txt" ]; then
     log_command "pip install -r $REPO_ROOT/llm-refactor-pipeline/requirements.txt"
     print_success "LLM Refactor Pipeline dependencies installed"
+fi
+
+# Install the pipeline package in editable mode (required: scripts resolve
+# repository paths through llm_refactor.core.paths, which needs the package
+# importable from inside the repository tree)
+print_step "Installing llm-refactor package (editable)..."
+if [ -f "$REPO_ROOT/llm-refactor-pipeline/pyproject.toml" ]; then
+    log_command "pip install -e $REPO_ROOT/llm-refactor-pipeline"
+    print_success "llm-refactor installed in editable mode"
 else
     print_warning "llm-refactor-pipeline/requirements.txt not found"
 fi
@@ -425,7 +434,7 @@ echo ""
 echo -e "${BOLD}📚 Documentation:${NC}"
 echo ""
 echo -e "  Installation log: ${YELLOW}install.log${NC}"
-echo -e "  Database cleanup: ${YELLOW}DATABASE_CLEANUP.md${NC}"
+echo -e "  Database cleanup: ${YELLOW}docs/database/cleanup.md${NC}"
 echo -e "  UI Documentation: ${YELLOW}smell-selector-ui/README.md${NC}"
 echo ""
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"

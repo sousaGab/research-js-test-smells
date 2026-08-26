@@ -40,7 +40,7 @@ Or use a project-wide `.env` in the root directory.
 ## Documentation
 
 See the root-level documentation:
-- `VENV_SETUP.md` - Complete setup guide
+- `docs/venv-setup.md` - Complete setup guide
 - `VENV_MIGRATION_PLAN.md` - Migration details
 - `requirements.txt` - All project dependencies
 
