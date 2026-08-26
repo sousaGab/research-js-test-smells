@@ -549,7 +549,12 @@ This is an academic research project. To contribute:
 
 ## License
 
-Academic research project - See LICENSE file for details.
+The original research code in this repository is released under the
+[MIT License](LICENSE).
+
+This repository also vendors third-party projects that keep their own licenses — the
+study corpus under `repositories/` and the detectors under `smell_detection_tools/`.
+See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for details.
 
 ## Support
 
