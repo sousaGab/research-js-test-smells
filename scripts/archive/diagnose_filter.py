@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Script de diagnóstico completo para o filtro coverage_decreased
+Complete diagnostic script for the coverage_decreased filter
 """
 
 import sqlite3
@@ -8,15 +8,15 @@ from llm_refactor.core.paths import RESEARCH_DB
 import sys
 
 def test_database():
-    """Testa os dados no banco"""
+    """Tests the data in the database"""
     print("=" * 80)
-    print("1. TESTE DO BANCO DE DADOS")
+    print("1. DATABASE TEST")
     print("=" * 80)
     
     conn = sqlite3.connect(RESEARCH_DB)
     cursor = conn.cursor()
     
-    # Contar experimentos por valor de coverage_decreased
+    # Count experiments per coverage_decreased value
     cursor.execute('''
         SELECT 
             coverage_decreased,
@@ -27,26 +27,26 @@ def test_database():
     ''')
     
     results = cursor.fetchall()
-    print("\nDistribuição de coverage_decreased:")
+    print("\nDistribution of coverage_decreased:")
     for row in results:
         value = "NULL" if row[0] is None else ("TRUE" if row[0] == 1 else "FALSE")
-        print(f"  {value}: {row[1]} experimentos")
+        print(f"  {value}: {row[1]} experiments")
     
     conn.close()
-    print("\n✅ Dados do banco estão OK")
+    print("\n✅ Database data is OK")
     return True
 
 
 def test_backend_query():
-    """Testa a query SQL que o backend usa"""
+    """Tests the SQL query used by the backend"""
     print("\n" + "=" * 80)
-    print("2. TESTE DA QUERY DO BACKEND")
+    print("2. BACKEND QUERY TEST")
     print("=" * 80)
     
     conn = sqlite3.connect(RESEARCH_DB)
     cursor = conn.cursor()
     
-    # Simular query com filtro TRUE
+    # Simulate the query with the TRUE filter
     cursor.execute('''
         SELECT COUNT(e.id)
         FROM experiments e
@@ -56,7 +56,7 @@ def test_backend_query():
     ''')
     count_true = cursor.fetchone()[0]
     
-    # Simular query com filtro FALSE  
+    # Simulate the query with the FALSE filter
     cursor.execute('''
         SELECT COUNT(e.id)
         FROM experiments e
@@ -66,64 +66,64 @@ def test_backend_query():
     ''')
     count_false = cursor.fetchone()[0]
     
-    print(f"\nResultados da query:")
-    print(f"  coverage_decreased = TRUE: {count_true} experimentos")
-    print(f"  coverage_decreased = FALSE: {count_false} experimentos")
+    print(f"\nQuery results:")
+    print(f"  coverage_decreased = TRUE: {count_true} experiments")
+    print(f"  coverage_decreased = FALSE: {count_false} experiments")
     
     conn.close()
-    print("\n✅ Query SQL funciona corretamente")
+    print("\n✅ SQL query works correctly")
     return True
 
 
 def test_frontend_params():
-    """Verifica os parâmetros que o frontend envia"""
+    """Checks the parameters sent by the frontend"""
     print("\n" + "=" * 80)
-    print("3. PARÂMETROS DO FRONTEND")
+    print("3. FRONTEND PARAMETERS")
     print("=" * 80)
     
-    print("\nO frontend deveria enviar:")
-    print("  - coverage_decreased='' (vazio) -> sem filtro")
-    print("  - coverage_decreased='true' -> filtrar TRUE")
-    print("  - coverage_decreased='false' -> filtrar FALSE")
+    print("\nThe frontend should send:")
+    print("  - coverage_decreased='' (empty) -> no filter")
+    print("  - coverage_decreased='true' -> filter TRUE")
+    print("  - coverage_decreased='false' -> filter FALSE")
     
-    print("\nO backend (FastAPI) converte automaticamente:")
+    print("\nThe backend (FastAPI) converts automatically:")
     print("  - 'true' -> boolean True -> SQL: 1")
     print("  - 'false' -> boolean False -> SQL: 0")
     
-    print("\n✅ Lógica de conversão está correta")
+    print("\n✅ Conversion logic is correct")
     return True
 
 
 def check_issues():
-    """Verifica problemas comuns"""
+    """Checks common issues"""
     print("\n" + "=" * 80)
-    print("4. PROBLEMAS COMUNS")
+    print("4. COMMON ISSUES")
     print("=" * 80)
     
     issues = []
     
-    # Verificar se backend está rodando
+    # Check whether the backend is running
     import subprocess
     try:
         result = subprocess.run(['ps', 'aux'], capture_output=True, text=True)
         if 'main.py' not in result.stdout and 'uvicorn' not in result.stdout:
-            issues.append("❌ Backend pode não estar rodando")
+            issues.append("❌ Backend may not be running")
         else:
-            print("  ✅ Backend está rodando")
+            print("  ✅ Backend is running")
     except:
         pass
     
-    # Verificar estrutura de arquivos
+    # Check file structure
     import os
     if not os.path.exists('smell-selector-ui/backend/main.py'):
-        issues.append("❌ Arquivo backend/main.py não encontrado")
+        issues.append("❌ File backend/main.py not found")
     else:
-        print("  ✅ Backend main.py existe")
+        print("  ✅ Backend main.py exists")
         
     if not os.path.exists('smell-selector-ui/frontend/src/hooks/useRefatoracoes.js'):
-        issues.append("❌ Arquivo useRefatoracoes.js não encontrado")
+        issues.append("❌ File useRefatoracoes.js not found")
     else:
-        print("  ✅ Frontend useRefatoracoes.js existe")
+        print("  ✅ Frontend useRefatoracoes.js exists")
     
     return len(issues) == 0, issues
 
@@ -131,29 +131,29 @@ def check_issues():
 def main():
     print("\n" * 2)
     print("╔" + "=" * 78 + "╗")
-    print("║" + " " * 15 + "DIAGNÓSTICO: Filtro coverage_decreased" + " " * 24 + "║")
+    print("║" + " " * 15 + "DIAGNOSIS: coverage_decreased filter" + " " * 26 + "║")
     print("╚" + "=" * 78 + "╝")
     print()
     
     all_ok = True
     
-    # Executar testes
+    # Run the tests
     try:
         test_database()
     except Exception as e:
-        print(f"\n❌ ERRO no teste do banco: {e}")
+        print(f"\n❌ ERROR in the database test: {e}")
         all_ok = False
     
     try:
         test_backend_query()
     except Exception as e:
-        print(f"\n❌ ERRO no teste da query: {e}")
+        print(f"\n❌ ERROR in the query test: {e}")
         all_ok = False
     
     try:
         test_frontend_params()
     except Exception as e:
-        print(f"\n❌ ERRO no teste dos parâmetros: {e}")
+        print(f"\n❌ ERROR in the parameter test: {e}")
         all_ok = False
     
     try:
@@ -163,26 +163,26 @@ def main():
             for issue in issues:
                 print(f"  {issue}")
     except Exception as e:
-        print(f"\n❌ ERRO na verificação de problemas: {e}")
+        print(f"\n❌ ERROR in the issue check: {e}")
         all_ok = False
     
-    # Resumo final
+    # Final summary
     print("\n" + "=" * 80)
-    print("RESUMO")
+    print("SUMMARY")
     print("=" * 80)
     
     if all_ok:
-        print("\n✅ TUDO FUNCIONANDO CORRETAMENTE")
-        print("\nSe o filtro não está funcionando no navegador, tente:")
-        print("  1. Limpar o cache do navegador (Ctrl+Shift+Del)")
-        print("  2. Recarregar a página com Ctrl+F5")
-        print("  3. Verificar o Console do navegador (F12) por erros")
-        print("  4. Reiniciar o backend e frontend")
-        print("\nComandos para reiniciar:")
+        print("\n✅ EVERYTHING WORKING CORRECTLY")
+        print("\nIf the filter is not working in the browser, try:")
+        print("  1. Clear the browser cache (Ctrl+Shift+Del)")
+        print("  2. Reload the page with Ctrl+F5")
+        print("  3. Check the browser console (F12) for errors")
+        print("  4. Restart the backend and frontend")
+        print("\nRestart commands:")
         print("  Backend:  cd smell-selector-ui/backend && python3 main.py")
         print("  Frontend: cd smell-selector-ui/frontend && npm start")
     else:
-        print("\n❌ PROBLEMAS ENCONTRADOS - veja acima")
+        print("\n❌ ISSUES FOUND - see above")
         return 1
     
     print("\n" + "=" * 80)

@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-Script temporário para remover comentário instrucional do LLM dos códigos refatorados.
+Temporary script to remove the LLM instructional comment from refactored code.
 
-Remove a linha: // Your COMPLETE refactored test code here
+Removes the line: // Your COMPLETE refactored test code here
 """
 
 import sqlite3
@@ -13,7 +13,7 @@ DB_PATH = RESEARCH_DB
 COMMENT_TO_REMOVE = '// Your COMPLETE refactored test code here'
 
 def remove_instructional_comment(code):
-    """Remove a linha do comentário instrucional, preservando outras linhas."""
+    """Removes the instructional comment line, preserving all other lines."""
     if not code:
         return code
     
@@ -21,15 +21,15 @@ def remove_instructional_comment(code):
     filtered_lines = []
     
     for line in lines:
-        # Remove linha que contém exatamente o comentário (com possíveis espaços)
+        # Drop the line that contains exactly the comment, allowing surrounding spaces
         if line.strip() == COMMENT_TO_REMOVE:
             continue
         filtered_lines.append(line)
     
-    # Remove linha vazia no início se existir (após remover o comentário)
+    # Drop a leading empty line left behind after removing the comment
     result = '\n'.join(filtered_lines)
     
-    # Remove múltiplas linhas vazias no início
+    # Collapse multiple leading empty lines
     while result.startswith('\n\n'):
         result = result[1:]
     
@@ -39,7 +39,7 @@ def main():
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     
-    # Buscar todos os códigos refatorados que contêm o comentário
+    # Fetch every refactored code containing the comment
     cursor.execute("""
         SELECT id, refactored_code 
         FROM experiments 
@@ -48,20 +48,20 @@ def main():
     
     rows = cursor.fetchall()
     
-    print(f"Encontrados {len(rows)} registros com o comentário instrucional")
+    print(f"Found {len(rows)} records with the instructional comment")
     
     if len(rows) == 0:
-        print("✅ Nenhum registro precisa ser atualizado")
+        print("✅ No record needs updating")
         conn.close()
         return
     
     updated_count = 0
     
     for experiment_id, refactored_code in rows:
-        # Remove o comentário
+        # Remove the comment
         cleaned_code = remove_instructional_comment(refactored_code)
         
-        # Atualiza no banco de dados
+        # Update the database
         cursor.execute("""
             UPDATE experiments 
             SET refactored_code = ?
@@ -70,20 +70,20 @@ def main():
         
         updated_count += 1
         
-        # Mostra preview para os primeiros 3
+        # Show a preview for the first 3
         if updated_count <= 3:
-            print(f"\n--- Experimento ID {experiment_id} ---")
-            print("ANTES (primeiras 3 linhas):")
+            print(f"\n--- Experiment ID {experiment_id} ---")
+            print("BEFORE (first 3 lines):")
             print('\n'.join(refactored_code.split('\n')[:3]))
-            print("\nDEPOIS (primeiras 3 linhas):")
+            print("\nAFTER (first 3 lines):")
             print('\n'.join(cleaned_code.split('\n')[:3]))
     
-    # Commit das alterações
+    # Commit the changes
     conn.commit()
     conn.close()
     
-    print(f"\n✅ {updated_count} registros atualizados com sucesso!")
-    print(f"   Comentário '{COMMENT_TO_REMOVE}' removido")
+    print(f"\n✅ {updated_count} records updated successfully!")
+    print(f"   Comment '{COMMENT_TO_REMOVE}' removed")
 
 if __name__ == '__main__':
     main()

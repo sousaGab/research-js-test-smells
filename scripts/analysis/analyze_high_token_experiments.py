@@ -1,28 +1,28 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Analisa experimentos que gastaram mais de 4000 tokens
+Analyzes experiments that consumed more than 4000 tokens
 """
 
 import sqlite3
 from llm_refactor.core.paths import RESEARCH_DB
 from pathlib import Path
 
-# Encontrar o banco de dados
+# Locate the database
 db_path = RESEARCH_DB
 
 if not db_path.exists():
-    print(f"❌ Banco de dados não encontrado em: {db_path}")
+    print(f"❌ Database not found at: {db_path}")
     exit(1)
 
-print(f"📊 Analisando banco de dados: {db_path}\n")
+print(f"📊 Analyzing database: {db_path}\n")
 
-# Conectar ao banco
+# Connect to the database
 conn = sqlite3.connect(db_path)
-conn.row_factory = sqlite3.Row  # Para acessar colunas por nome
+conn.row_factory = sqlite3.Row  # Access columns by name
 cursor = conn.cursor()
 
-# Consulta: experimentos com mais de 4000 tokens
+# Query: experiments with more than 4000 tokens
 query = """
 SELECT 
     e.id,
@@ -51,9 +51,9 @@ cursor.execute(query)
 results = cursor.fetchall()
 
 if not results:
-    print("✅ Nenhum experimento encontrado com mais de 4000 tokens.")
+    print("✅ No experiment found with more than 4000 tokens.")
 else:
-    print(f"🔍 Encontrados {len(results)} experimentos com mais de 4000 tokens:\n")
+    print(f"🔍 Found {len(results)} experiments with more than 4000 tokens:\n")
     print("=" * 120)
     
     total_tokens = 0
@@ -61,30 +61,30 @@ else:
     for row in results:
         total_tokens += row['tokens_used'] if row['tokens_used'] else 0
         
-        print(f"\n🔹 Experimento #{row['id']}")
-        print(f"   📅 Data: {row['experiment_date']}")
-        print(f"   🤖 Modelo: {row['ai_tool']} / {row['ai_model_version']}")
-        print(f"   📝 Abordagem: {row['prompting_approach']}")
+        print(f"\n🔹 Experiment #{row['id']}")
+        print(f"   📅 Date: {row['experiment_date']}")
+        print(f"   🤖 Model: {row['ai_tool']} / {row['ai_model_version']}")
+        print(f"   📝 Approach: {row['prompting_approach']}")
         print(f"   🪙 Tokens: {row['tokens_used']:,}")
-        print(f"   ⏱️  Tempo total: {row['execution_time_seconds']:.2f}s" if row['execution_time_seconds'] else "   ⏱️  Tempo total: N/A")
+        print(f"   ⏱️  Total time: {row['execution_time_seconds']:.2f}s" if row['execution_time_seconds'] else "   ⏱️  Total time: N/A")
         print(f"   ⚡ LLM latency: {row['llm_latency_seconds']:.2f}s" if row['llm_latency_seconds'] else "   ⚡ LLM latency: N/A")
         print(f"   🧪 Smell type: {row['smell_type']}")
-        print(f"   📁 Repositório: {row['repository']}")
-        print(f"   📄 Arquivo: {row['file_path']}")
-        print(f"   ✅ Smell removido: {'Sim' if row['smell_removed'] else 'Não' if row['smell_removed'] is not None else 'N/A'}")
-        print(f"   ✅ Refatoração completa: {'Sim' if row['refactoring_completed'] else 'Não' if row['refactoring_completed'] is not None else 'N/A'}")
-        print(f"   ✅ Testes passando: {'Sim' if row['tests_still_passing'] else 'Não' if row['tests_still_passing'] is not None else 'N/A'}")
+        print(f"   📁 Repository: {row['repository']}")
+        print(f"   📄 File: {row['file_path']}")
+        print(f"   ✅ Smell removed: {'Yes' if row['smell_removed'] else 'No' if row['smell_removed'] is not None else 'N/A'}")
+        print(f"   ✅ Refactoring completed: {'Yes' if row['refactoring_completed'] else 'No' if row['refactoring_completed'] is not None else 'N/A'}")
+        print(f"   ✅ Tests passing: {'Yes' if row['tests_still_passing'] else 'No' if row['tests_still_passing'] is not None else 'N/A'}")
         print("-" * 120)
     
-    print(f"\n📊 ESTATÍSTICAS:")
-    print(f"   • Total de experimentos: {len(results)}")
-    print(f"   • Total de tokens: {total_tokens:,}")
-    print(f"   • Média de tokens: {total_tokens / len(results):,.0f}")
-    print(f"   • Máximo de tokens: {max(row['tokens_used'] for row in results):,}")
-    print(f"   • Mínimo de tokens (>4000): {min(row['tokens_used'] for row in results):,}")
+    print(f"\n📊 STATISTICS:")
+    print(f"   • Total experiments: {len(results)}")
+    print(f"   • Total tokens: {total_tokens:,}")
+    print(f"   • Average tokens: {total_tokens / len(results):,.0f}")
+    print(f"   • Maximum tokens: {max(row['tokens_used'] for row in results):,}")
+    print(f"   • Minimum tokens above 4000: {min(row['tokens_used'] for row in results):,}")
 
-# Estatísticas por modelo
-print(f"\n📊 TOKENS POR MODELO:")
+# Statistics per model
+print(f"\n📊 TOKENS BY MODEL:")
 cursor.execute("""
 SELECT 
     ai_tool,
@@ -101,10 +101,10 @@ ORDER BY total_tokens DESC
 
 model_stats = cursor.fetchall()
 for row in model_stats:
-    print(f"   • {row['ai_tool']} / {row['ai_model_version']}: {row['count']} experimentos, {row['total_tokens']:,} tokens (média: {row['avg_tokens']:,.0f}, máx: {row['max_tokens']:,})")
+    print(f"   • {row['ai_tool']} / {row['ai_model_version']}: {row['count']} experiments, {row['total_tokens']:,} tokens (avg: {row['avg_tokens']:,.0f}, max: {row['max_tokens']:,})")
 
-# Estatísticas por smell type
-print(f"\n📊 TOKENS POR SMELL TYPE:")
+# Statistics per smell type
+print(f"\n📊 TOKENS BY SMELL TYPE:")
 cursor.execute("""
 SELECT 
     bsd.smell_type,
@@ -121,7 +121,7 @@ ORDER BY total_tokens DESC
 
 smell_stats = cursor.fetchall()
 for row in smell_stats:
-    print(f"   • {row['smell_type']}: {row['count']} experimentos, {row['total_tokens']:,} tokens (média: {row['avg_tokens']:,.0f}, máx: {row['max_tokens']:,})")
+    print(f"   • {row['smell_type']}: {row['count']} experiments, {row['total_tokens']:,} tokens (avg: {row['avg_tokens']:,.0f}, max: {row['max_tokens']:,})")
 
 conn.close()
-print("\n✅ Análise concluída!")
+print("\n✅ Analysis complete!")
