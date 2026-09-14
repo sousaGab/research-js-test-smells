@@ -1,19 +1,19 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Analisa as mudanças de assertions nos pares antes/depois de refatoração.
+Analyzes assertion changes in the before/after refactoring pairs.
 
-Extrai os 3.600 pares de código do banco, compara os ASTs com o analisador
-Babel (scripts/analysis/assertion_ast_analyzer.js), classifica cada par com
-flags de enfraquecimento de verificação e agrega os resultados usados na
-seção "Changes in Test Assertions" do artigo. As regras completas estão
-documentadas em docs/assertion-analysis.md.
+Extracts the 3,600 code pairs from the database, compares their ASTs with
+the Babel analyzer (scripts/analysis/assertion_ast_analyzer.js), classifies
+each pair with verification-weakening flags, and aggregates the results
+used by the article's "Changes in Test Assertions" section. The complete
+rules are documented in docs/assertion-analysis.md.
 
-Saídas em research_data/assertion_analysis/:
-  pairs.jsonl               pares extraídos do banco
-  metrics.jsonl             contagens por trecho (antes e depois)
-  classified.jsonl          flags e contexto de execução por par
-  validation_package.csv    casos sinalizados, para validação humana
+Outputs in research_data/assertion_analysis/:
+  pairs.jsonl               pairs extracted from the database
+  metrics.jsonl             per-snippet counts (before and after)
+  classified.jsonl          flags and execution context per pair
+  validation_package.csv    flagged cases, laid out for human rating
 """
 
 import csv
@@ -36,7 +36,7 @@ NODE_MODULES = (
 
 ERROR_TYPES = "'syntax_error','runtime_error','module_resolution_error','timeout','unknown'"
 
-# Flags que sinalizam enfraquecimento da lógica de verificação
+# Flags that signal a weakening of the verification logic
 STRICT_FLAGS = {
     "ASSERTION_LOSS",
     "ALL_ASSERTIONS_GONE",
@@ -49,8 +49,8 @@ STRICT_FLAGS = {
     "EXECUTED_TESTS_DECREASED",
 }
 
-# Flags verificáveis mecanicamente; a perda de contagem de assertions
-# (ASSERTION_LOSS sozinha) exige validação humana
+# Mechanically verifiable flags; a bare assertion-count loss
+# (ASSERTION_LOSS alone) requires human validation
 MECHANICAL_FLAGS = {
     "TAUTOLOGY_ADDED",
     "EXECUTED_TESTS_DECREASED",
@@ -62,7 +62,7 @@ MECHANICAL_FLAGS = {
 
 
 def extract_pairs():
-    """Extrai os pares antes/depois e o contexto de execução do banco."""
+    """Extracts the before/after pairs and execution context from the database."""
     conn = sqlite3.connect(RESEARCH_DB)
     conn.row_factory = sqlite3.Row
     query = f"""
@@ -95,7 +95,7 @@ def extract_pairs():
 
 
 def run_ast_analyzer():
-    """Roda o analisador Babel sobre os pares extraídos."""
+    """Runs the Babel analyzer over the extracted pairs."""
     env = dict(os.environ, NODE_PATH=str(NODE_MODULES))
     subprocess.run(
         ["node", str(ANALYZER),
@@ -111,7 +111,7 @@ def run_ast_analyzer():
 
 
 def classify(pair, metric):
-    """Aplica as flags de classificação e o critério oficial de estado de teste."""
+    """Applies the classification flags and the official test-state criterion."""
     before, after = metric["before"], metric["after"]
     flags = []
     passed = (
@@ -136,8 +136,8 @@ def classify(pair, metric):
         flags.append("TEST_DISABLED")
     if after["emptyTests"] > before["emptyTests"]:
         flags.append("TEST_EMPTIED")
-    # A execução real é o árbitro: um trecho que perde it()/test() enquanto a
-    # suíte executa MAIS testes é um split/parametrização, não uma remoção
+    # Real execution is the arbiter: a snippet that loses it()/test() while
+    # the suite executes MORE tests is a split/parameterization, not a removal
     if after["testCases"] < before["testCases"] and (exec_delta is None or exec_delta <= 0):
         flags.append("TEST_CASE_REMOVED")
     if after["commentedAssertions"] > before["commentedAssertions"]:
@@ -150,10 +150,10 @@ def classify(pair, metric):
 
 
 def is_strict_flagged(row):
-    """Sinalizado fora do cenário de redução esperada.
+    """Flagged outside the expected-reduction scenario.
 
-    Para Duplicate Assert a redução de assertions é a própria transformação
-    pretendida, então ASSERTION_LOSS sozinha não conta para esse smell.
+    For Duplicate Assert the assertion reduction is the intended
+    transformation itself, so ASSERTION_LOSS alone does not count there.
     """
     hits = set(row["flags"]) & STRICT_FLAGS
     if not hits:
@@ -162,7 +162,7 @@ def is_strict_flagged(row):
 
 
 def write_validation_package(rows, pairs):
-    """Exporta os casos sinalizados para validação humana independente."""
+    """Exports the flagged cases for independent human rating."""
     flagged = sorted(
         (r for r in rows if r["passed"] and r["smell_removed"] and is_strict_flagged(r)),
         key=lambda r: r["id"],
@@ -193,17 +193,17 @@ def write_validation_package(rows, pairs):
 
 def main():
     if not RESEARCH_DB.exists():
-        print(f"❌ Banco de dados não encontrado em: {RESEARCH_DB}")
+        print(f"❌ Database not found at: {RESEARCH_DB}")
         sys.exit(1)
     if not NODE_MODULES.exists():
-        print(f"❌ Dependências do analisador não encontradas em: {NODE_MODULES}")
-        print("   Rode npm install em llm-refactor-pipeline/src/llm_refactor/modules/detect_smells/get_method")
+        print(f"❌ Analyzer dependencies not found at: {NODE_MODULES}")
+        print("   Run npm install in llm-refactor-pipeline/src/llm_refactor/modules/detect_smells/get_method")
         sys.exit(1)
     OUT_DIR.mkdir(parents=True, exist_ok=True)
 
-    print(f"📊 Analisando banco de dados: {RESEARCH_DB}\n")
+    print(f"📊 Analyzing database: {RESEARCH_DB}\n")
     pairs = extract_pairs()
-    print(f"✅ Pares extraídos: {len(pairs)}")
+    print(f"✅ Pairs extracted: {len(pairs)}")
 
     metrics = run_ast_analyzer()
 
@@ -231,16 +231,16 @@ def main():
     taut_green = [r for r in rows if "TAUTOLOGY_ADDED" in r["flags"] and r["passed"]]
     n_validation = write_validation_package(rows, pairs)
 
-    print(f"\n✅ Sucessos aparentes (verde e smell removido): {len(successes)}")
-    print(f"✅ Perda de assertions: {len(loss)} no total, {len(loss_green)} verdes")
-    print(f"✅ Assertions sempre-verdadeiras adicionadas e verdes: {len(taut_green)}")
-    print(f"✅ Sinalizados (critério estrito): {len(strict)}"
-          f" = {100 * len(strict) / len(successes):.1f}% dos sucessos")
-    print(f"✅ Sinalizados (critério amplo): {len(broad)}"
+    print(f"\n✅ Apparent successes (passing and smell removed): {len(successes)}")
+    print(f"✅ Assertion loss: {len(loss)} total, {len(loss_green)} passing")
+    print(f"✅ Always-true assertions added and passing: {len(taut_green)}")
+    print(f"✅ Flagged (strict criterion): {len(strict)}"
+          f" = {100 * len(strict) / len(successes):.1f}% of successes")
+    print(f"✅ Flagged (broad criterion): {len(broad)}"
           f" = {100 * len(broad) / len(successes):.1f}%")
-    print(f"✅ Distribuição das flags (estrito): "
+    print(f"✅ Flag distribution (strict set): "
           f"{Counter(f for r in strict for f in set(r['flags']) & STRICT_FLAGS)}")
-    print(f"\n📋 Pacote de validação humana: {n_validation} casos em "
+    print(f"\n📋 Human validation package: {n_validation} cases at "
           f"{OUT_DIR / 'validation_package.csv'}")
 
 
