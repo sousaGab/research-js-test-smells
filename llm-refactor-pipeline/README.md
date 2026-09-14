@@ -66,6 +66,7 @@ Once inside the interactive shell:
   - `refactor <smell_id>` - Preview refactored code (dry-run)
   - `refactor <smell_id> --apply` - Apply changes with automatic backup
   - `refactor <smell_id> <strategy> <model> --apply` - Custom strategy/model + apply
+- `analyze_assertions` - Before/after assertion analysis of all refactorings
 - `db` - Database operations
 - `ui` - Start the Smell Selector web UI
 - `help` - Show available commands

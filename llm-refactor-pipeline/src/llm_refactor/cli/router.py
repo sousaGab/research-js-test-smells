@@ -6,7 +6,7 @@ This is the central hub that connects CLI input to module execution.
 """
 
 from typing import Dict, Callable, Tuple, Optional
-from llm_refactor.modules import detect_smells
+from llm_refactor.modules import detect_smells, assertion_analysis
 from llm_refactor.modules import run_tests
 from llm_refactor.modules import database_module
 from llm_refactor.modules import ui_server
@@ -35,6 +35,12 @@ class CommandRouter:
             command="run_tests",
             handler=run_tests.execute,
             description="Execute Run Tests module"
+        )
+
+        self.register(
+            command="analyze_assertions",
+            handler=assertion_analysis.execute,
+            description="Before/after assertion analysis of refactorings"
         )
 
         self.register(

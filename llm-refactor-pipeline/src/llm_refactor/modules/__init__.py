@@ -22,7 +22,8 @@ from . import (
     ui_server,
     refactor,
     backup_manager,
-    execute_experiment
+    execute_experiment,
+    assertion_analysis
 )
 
 __all__ = [
@@ -33,5 +34,6 @@ __all__ = [
     "ui_server",
     "refactor",
     "backup_manager",
-    "execute_experiment"
+    "execute_experiment",
+    "assertion_analysis"
 ]
