@@ -52,6 +52,7 @@ install.log
 # Research Database
 research_data/research.db
 research_data/backups/
+research_data/assertion_analysis/
 *.db-journal
 *.db-wal
 *.db-shm
